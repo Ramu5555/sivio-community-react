@@ -90,7 +90,7 @@ function ApplicationTab() {
                             {data.map((contact) => (
                                 <tr key={contact.Id}>
                                     <td>{contact.Name}</td>
-                                    <td>............</td>
+                                    <td>.............</td>
                                     <td>{contact.Status__c}</td>
                                     <td><button type='submit' className='buttonStyle' onClick={aplliContinue} style={{marginLeft:'10px'}}>Continue</button></td>
                                 </tr>
