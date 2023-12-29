@@ -3,13 +3,14 @@ import { useState, useEffect } from "react";
 import './HomePage.css';
 import HomeTab from './HomeTab';
 import ApplicationTab from './ApplicationTab';
-import AboutUsTab from './AboutUsTab';
+import ServiceRequestTab from './ServiceRequestTab';
 
+//  ------------------------------------------------ JS  ------------------------------------------------
 function HomePage() {
-
-    // ***************************************************** JS *************************************************
-
+    // ------------------------------------------------Variable Declaration Starts here---------------------------------------------------
     const [activeTab, setActiveTab] = useState('Home');
+    const [onApplicationTab, setApplicationTab] = useState(false);
+
     useEffect(() => {
         setActiveTab('Home');
     }, []);
@@ -27,9 +28,12 @@ function HomePage() {
         }
         document.getElementById(tabName).style.display = "block"; 
         event.currentTarget.className += " active";
+        if(tabName === 'Application'){
+            setApplicationTab(true);
+        }
     }
 
-    // ***************************************************** HTML *************************************************
+    //  ------------------------------------------------ HTML  ------------------------------------------------
     return(
         <>
             <div className="PageHeader">
@@ -40,7 +44,7 @@ function HomePage() {
                     <div className="tab">
                         <button className="tabbutton" onClick={(event) => onNavigationClick(event, "Home")}>Home</button>
                         <button className="tabbutton" onClick={(event) => onNavigationClick(event, "Application")}>Application</button>
-                        <button className="tabbutton" onClick={(event) => onNavigationClick(event, "AboutUs")}>About Us</button>
+                        <button className="tabbutton" onClick={(event) => onNavigationClick(event, "ServiceRequest")}>Service Request</button>
 
                         {/* <button className="tabbutton" onClick={(event) => onNavigationClick(event, "Groups")}>Groups</button>
                         <button className="tabbutton" onClick={(event) => onNavigationClick(event, "myReq")}>My Requests</button> */}
@@ -52,10 +56,12 @@ function HomePage() {
                     <HomeTab/>
                 </div>
                 <div id="Application" className={`tabContent ${activeTab === 'Application' ? 'active' : ''}`}>
-                    <ApplicationTab/>
+                    {onApplicationTab && (
+                        <ApplicationTab/>
+                    )}
                 </div>
-                <div id="AboutUs" className={`tabContent ${activeTab === 'AboutUs' ? 'active' : ''}`}>
-                    <AboutUsTab/>
+                <div id="ServiceRequest" className={`tabContent ${activeTab === 'ServiceRequest' ? 'active' : ''}`}>
+                    <ServiceRequestTab/>
                 </div>
             </div>
         </>

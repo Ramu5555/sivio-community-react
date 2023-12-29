@@ -1,6 +1,15 @@
 import React from 'react';
 import { useState, useEffect } from "react";
 import axios from 'axios';
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faEye } from '@fortawesome/free-solid-svg-icons';
+import { faAnglesRight } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+
+import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 import './ApplicationTab.css';
 
 import PersonalDetails from './PersonalDetails';
@@ -14,18 +23,37 @@ import Recommendations from './Recommendations';
 import Resume from './Resume';
 import Declaration from './Declaration';
 
+import NewApplication from './NewApplication';
+
+// ------------------------------------------------JS Starts here---------------------------------------------------
 function ApplicationTab() {
-    const [data, setData] = useState([]); 
+
+    // ------------------------------------------------Variable Declaration Starts here---------------------------------------------------
+    const [applicationsList, setapplicationsList] = useState([]);
+    const [campusList, setCampusList] = useState([]);
+
+    const [modalOpen, setModalOpen] = useState(false);
+    const [createApplication, setcreateApplication] = useState(false);
+    const [viewApplicationodal, setviewApplicationodal] = useState(false);
+    const [campusEnable, setcampusEnable] = useState(false);
+
+    const [applicationNumber, setapplicationNumber] = useState('');
+    const [communityStatus, setcommunityStatus] = useState('');
+    const [semister, setsemister] = useState('');
+    const [submittedDate, setsubmittedDate] = useState('');
+
         useEffect(() => { 
-        axios.get('http://localhost:5000/api/data')
+        axios.get('http://localhost:5000/api/Applications')
         .then(response => {
-            setData(response.data.records);
+            setapplicationsList(response.data);
+            console.log('Applications:: ',response.data)
         }) 
         .catch(error => { 
             console.error('Error fetching data:', error); 
         });
         }, []);
 
+        // ------------------------------------------------Application continue button ---------------------------------------------------
         const aplliContinue = ()=> {
             console.log('apppp')
             if (document.getElementById('ApplicationTable')) {
@@ -40,9 +68,20 @@ function ApplicationTab() {
             }
             document.getElementById("defaultOpen").click();
         }
-        const openModal = ()=> {
 
+        // ------------------------------------------------Application View button ---------------------------------------------------
+        const viewApplication = (status, applicationNo,submitDate) =>{
+            setviewApplicationodal(true);
+            setapplicationNumber(applicationNo);
+            setcommunityStatus(status)
+            setsubmittedDate(submitDate)
         }
+
+        const onModalClose = () =>{
+            setviewApplicationodal(false);
+        }
+
+        // ------------------------------------------------Application Tab button ---------------------------------------------------
         const appTabClick = (evt, name)=>{
             var i, tabcontent, tablinks;
             tabcontent = document.getElementsByClassName("vtabcontent");
@@ -68,6 +107,50 @@ function ApplicationTab() {
                 }
             }
         }
+        // ------------------------------------------------New Application button ---------------------------------------------------
+        const newApplication = () => {
+            setcreateApplication(true);
+            setcampusEnable(true)
+            axios.get('http://localhost:5000/api/campus')
+            .then(response => {
+                setCampusList(response.data);
+                setcampusEnable(false)
+            }) 
+            .catch(error => { 
+                console.error('Error fetching data:', error); 
+            });
+            setModalOpen(true);
+        };
+
+        // ------------------------------------------------close Modal ---------------------------------------------------
+        const closeModal = () => {
+            setModalOpen(false);
+        };
+
+        // ------------------------------------------------Refresh Applications after saving the Application---------------------------------------------------
+        const RefreshData = () => {
+            toast.success('Application Successfully Created', {
+                position: "top-center",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored",
+              });
+            console.log('Refresh');
+            axios.get('http://localhost:5000/api/Applications')
+                .then(response => {
+                    setapplicationsList(response.data);
+                    console.log('Updated Data: ', response.data);
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        };
+
+// ------------------------------------------------HTML Starts here---------------------------------------------------      
     return(
         <>
            <div className="grid-container">
@@ -75,29 +158,78 @@ function ApplicationTab() {
 
                 </div>
                 <div className="grid-item">
+                <ToastContainer/>
                     <div style={{fontSize:'20px',fontWeight:'500'}}>Applications</div>
                     <div className='ApplicationTable' id='ApplicationTable'>
                         <table style={{width:'100%',paddingTop:'10px'}}>
                             <thead>
                                 <tr>
-                                    <th style={{width:'25%',textAlign:'left'}}>Name</th>
-                                    <th style={{width:'25%',textAlign:'left'}}>Course Name</th>
-                                    <th style={{width:'25%',textAlign:'left'}}>Community Status</th>
-                                    <th style={{width:'25%',textAlign:'left'}}></th>
+                                    <th style={{width:'20%',textAlign:'left'}}>Name</th>
+                                    <th style={{width:'30%',textAlign:'left'}}>Course Name</th>
+                                    <th style={{width:'30%',textAlign:'left'}}>Status</th>
+                                    <th style={{width:'20%',textAlign:'left'}}></th>
                                 </tr>
                             </thead>
                             <tbody>  
-                            {data.map((contact) => (
-                                <tr key={contact.Id}>
-                                    <td>{contact.Name}</td>
-                                    <td>.............</td>
-                                    <td>{contact.Status__c}</td>
-                                    <td><button type='submit' className='buttonStyle' onClick={aplliContinue} style={{marginLeft:'10px'}}>Continue</button></td>
+                            {applicationsList.map((contact) => (
+                                <tr key={contact.appId}>
+                                    <td>{contact.applicationNumber}</td>
+                                    <td>{contact.courseName}</td>
+                                    <td>{contact.communityStatus}</td>
+                                    <td>{contact.communityStatus === 'Accepted' || contact.communityStatus === 'Review In-Progress' ? (
+                                        <button type='submit' className='buttonStyle' onClick={(event)=> viewApplication(contact.communityStatus,contact.applicationNumber,contact.submittedDate)} style={{ marginLeft: '10px' }}>
+                                            <FontAwesomeIcon icon={faEye} /> View
+                                        </button>
+                                        ) : (
+                                        <button type='submit' className='buttonStyle' onClick={aplliContinue} style={{ marginLeft: '10px' }}>
+                                            Continue <FontAwesomeIcon icon={faAnglesRight} />
+                                        </button>
+                                        )}
+                                    </td>
                                 </tr>
                                 ))}
                             </tbody>
                         </table>
-                        <button style={{marginTop:'10px'}} type='submit' className='buttonStyle' onClick={openModal}><i class="fa fa-plus"></i> Add New</button>
+                        <button style={{marginTop:'10px'}} type='submit' className='buttonStyle' onClick={newApplication}><FontAwesomeIcon className='plusIcon' icon={faPlus} />   Add New</button>
+
+                        {createApplication && (
+                            <NewApplication isOpen={modalOpen} campusList={campusList} onClose={closeModal} onApplicationSave={RefreshData} campusEnable={campusEnable}>
+                            </NewApplication>
+                        )}
+                        {viewApplicationodal && (
+                            <div className="modal-overlay">
+                                <div className="modal">
+                                    <div className="modal-header">
+                                        <button className="close-button" onClick={onModalClose}>
+                                            &times;
+                                        </button>
+                                        <h3>Application Details</h3>
+                                    </div>
+                                    <div className="modal-body">
+                                    <div className="account-details">
+                                        <div className="custom-select">
+                                            <label htmlFor="ApplicationNo">Application No</label>
+                                            <div><output>{applicationNumber}</output></div>
+                                            
+                                        </div>
+                                        <div className="custom-select">
+                                            <label htmlFor="CommunityStatus">Community Status</label>
+                                            <div><output>{communityStatus}</output></div>
+                                        </div>
+                                        <div className="custom-select">
+                                            <label htmlFor="Semester">Semester</label>
+                                            <div><output>{semister}</output></div>
+                                        </div>
+                                        <div className="custom-select">
+                                            <label htmlFor="SubmittedDate">Submitted Date</label>
+                                            <div><output>{submittedDate}</output></div>
+                                        </div>
+                                    </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
                     </div>
                     <div id='editApplication'>
                         <div className="vtab">
@@ -113,7 +245,7 @@ function ApplicationTab() {
                             <button className="vtablinks" onClick={(event) => appTabClick(event, "Resume")}>Resume</button>
                             <button className="vtablinks" onClick={(event) => appTabClick(event, "Declaration")}>Declaration</button>
                         </div>
-                        <div><button className='buttonStyle' style={{float:'right'}} onClick={backtoAppliactions}>Back to Applications</button></div>
+                        <div><button className='buttonStyle' style={{float:'right'}} onClick={backtoAppliactions}><FontAwesomeIcon icon={faArrowLeft} /> Back to Applications</button></div>
                         <div id="AppHome" className="vtabcontent">
                             <div style={{fontSize:'1.125rem',marginTop:'200px'}}>
                                 Welcome to our portal! Please take the next step by clicking the "Continue" button to provide the remaining details and complete your application. We are excited to review your finished application as you get one step closer to realizing your aspirations."
