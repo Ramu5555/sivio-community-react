@@ -4,11 +4,18 @@ import axios from 'axios';
 import './FamilyDetails.css';
 import { FadeLoader  } from 'react-spinners';
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faTrash, faPencil } from '@fortawesome/free-solid-svg-icons';
+
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
       
 function FamilyDetails(){
     // ------------------------------------------------Variable Declaration Starts here---------------------------------------------------
+
+    const pythonDomain = 'http://localhost:5000/';
+
     const [familyList, setfamilyList] = useState([]);
     const [modal, setModal] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -19,27 +26,28 @@ function FamilyDetails(){
     const [countryOptions, setcountryOptions] = useState(useState(new Map()));
     const [HLEOptions, setHLEOptions] = useState(useState(new Map()));
 
-    const[firstName,setFirstName] = useState('');
-    const[lastName,setLastName] = useState('');
-    const[relationship,setRelationship] = useState('');
-    const[occupation,setOccupation] = useState('');
-    const[employer,setEmployer] = useState('');
-    const[gender,setGender] = useState('');
-    const[dateofBirth,setDateofBirth] = useState('');
-    const[qualification,setQualification] = useState('');
-    const[contactNumber,setContactNumber] = useState('');
-    const[email,setEmail] = useState('');
-    const[industry,setIndustry] = useState('');
-    const[country,setCountry] = useState('');
-    const[state,setState] = useState('');
-    const[city,setCity] = useState('');
-    const[highestLevelofStudy,setHighestLevelofStudy] = useState('');
+    const[familyId, setFamilyId] = useState();
+    const[firstName,setFirstName] = useState();
+    const[lastName,setLastName] = useState();
+    const[relationship,setRelationship] = useState();
+    const[occupation,setOccupation] = useState();
+    const[employer,setEmployer] = useState();
+    const[gender,setGender] = useState();
+    const[dateofBirth,setDateofBirth] = useState();
+    const[qualification,setQualification] = useState();
+    const[contactNumber,setContactNumber] = useState();
+    const[email,setEmail] = useState();
+    const[industry,setIndustry] = useState();
+    const[country,setCountry] = useState();
+    const[state,setState] = useState();
+    const[city,setCity] = useState();
+    const[highestLevelofStudy,setHighestLevelofStudy] = useState();
     const[IfDeceased,setIfDeceased] = useState(false);
 
 
     useEffect(() => {
         // if(familyList === undefined){
-            axios.get('http://localhost:5000/api/familyDetails')
+            axios.post(`${pythonDomain}familyDetails`)
             .then(response => {
                 setfamilyList(response.data);
                 console.log('FamilyDetails:: ',response.data)
@@ -52,7 +60,7 @@ function FamilyDetails(){
 
     const addNewFamily = ()=>{
         setLoading(true)
-        axios.get('http://localhost:5000/api/familyPickLists')
+        axios.post(`${pythonDomain}familyPickLists`)
         .then(response => {
             console.log('relationshipOptions22:: ',JSON.stringify(response.data.relationshipPickList))
             const noneOption = { id: null, name: '--None--' };
@@ -79,39 +87,122 @@ function FamilyDetails(){
     }
     const onModalClose = ()=>{
         setModal(false);
-        setFirstName('');
-        setLastName('');
-        setRelationship('');
-        setOccupation('');
-        setEmployer('');
-        setGender('');
-        setDateofBirth('');
-        setQualification('');
-        setContactNumber('');
-        setEmail('');
-        setIndustry('');
-        setCountry('');
-        setState('');
-        setCity('');
-        setHighestLevelofStudy('');
-        setIfDeceased(false);
+            setFirstName('');
+            setLastName('');
+            setRelationship('');
+            setOccupation('');
+            setEmployer('');
+            setGender('');
+            setDateofBirth('');
+            setQualification('');
+            setContactNumber('');
+            setEmail('');
+            setIndustry('');
+            setCountry('');
+            setState('');
+            setCity('');
+            setHighestLevelofStudy('');
+            setIfDeceased(false);
+       
     }
    
-    const updateFamily = () =>{
+    const updateFamily = (famId) =>{
+        setLoading(true);
         setModal(true);
-    }
-    const deleteFamily = () =>{
+        axios.post(`${pythonDomain}updateFamilyRecord?familyRecordId=${famId}`)
+        .then(response => {
+            console.log('FamilyDetails:: ',response.data.familyRecord.Id)
+            let famRec = response.data.familyRecord;
+                setFamilyId(famRec.Id);
+                setFirstName(famRec.FirstName__c);
+                setLastName(famRec.Last_Name__c);
+                setRelationship(famRec.Relationship__c);
+                setOccupation(famRec.Occupation_Title__c);
+                setEmployer(famRec.Employer__c);
+                setGender(famRec.Gender__c);
+                setDateofBirth(famRec.DOB__c);
+                setQualification(famRec.Qualififcation__c);
+                setContactNumber(famRec.Contact_Number__c);
+                setEmail(famRec.Family_Email__c);
+                setIndustry(famRec.Industry__c);
+                setCountry(famRec.Country__c);
+                setState(famRec.State__c);
+                setCity(famRec.City__c);
+                setHighestLevelofStudy(famRec.Highest_Level_Of_Education__c);
+                setIfDeceased(famRec.deceased__c)
 
+                const noneOption = { id: null, name: '--None--' };
+            const relationshipOptions = [noneOption, ...Object.entries(response.data.relationshipPickList).map(([key, value]) => ({ id: key, name: value }))];
+            const genderOptions = [noneOption, ...Object.entries(response.data.genderPickList).map(([key, value]) => ({ id: key, name: value }))];
+            const industryOptions = [noneOption, ...Object.entries(response.data.industryPickiList).map(([key, value]) => ({ id: key, name: value }))];
+            const countryOptions = [noneOption, ...Object.entries(response.data.countryPickList).map(([key, value]) => ({ id: key, name: value }))];
+            const HLEOptions = [noneOption, ...Object.entries(response.data.HLEpickList).map(([key, value]) => ({ id: key, name: value }))];
+
+            setrelationshipOptions(relationshipOptions);
+            setgenderOptions(genderOptions);
+            setindustryOptions(industryOptions);
+            setcountryOptions(countryOptions);
+            setHLEOptions(HLEOptions);
+
+                setLoading(false);
+        }) 
+        .catch(error => { 
+            console.error('FamilyDetails Error fetching data:', error); 
+        });
+        
+    }
+    const deleteFamily = (famId) => {
+        setLoading(true);
+        console.log('Delete Family Record: ',famId);
+        axios.post(`${pythonDomain}deleteFamilyRecord?familyRecordId=${famId}`)
+            .then(response => {
+                console.log('Family DElete Response:: ',response.data)
+                if(response.data === 'Family Record Successfully Deleted'){
+                    toast.success(response.data, {
+                        position: "top-center",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "colored",
+                      });
+                      axios.post(`${pythonDomain}familyDetails`)
+                        .then(response => {
+                            setfamilyList(response.data);
+                            console.log('FamilyDetails:: ',response.data)
+                            setLoading(false);
+                        }) 
+                        .catch(error => { 
+                            console.error('FamilyDetails Error fetching data:', error); 
+                        });
+                }else{
+                    toast.error(response.data, {
+                        position: "top-center",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "colored",
+                      });
+                }
+            }) 
+            .catch(error => { 
+                console.error('FamilyDetails Error fetching data:', error); 
+            });
     }
     const onSave =() =>{
 
-        const familyRecordData = {firstName:firstName,lastName:lastName,relationship:relationship,occupation:occupation,employer:employer,gender:gender,dateofBirth:dateofBirth,
+        const familyRecordData = {id:familyId, firstName:firstName,lastName:lastName,relationship:relationship,occupation:occupation,employer:employer,gender:gender,dateofBirth:dateofBirth,
                                   qualification:qualification,contactNumber:contactNumber,email:email,industry:industry,country:country,state:state,city:city,highestLevelofStudy:highestLevelofStudy,
                                   IfDeceased:IfDeceased}
 
         console.log('familyRecordData:: ',JSON.stringify(familyRecordData))
 
-        axios.get(`http://localhost:5000/api/newFamilyRecord?familyRecord=${JSON.stringify(familyRecordData)}`)
+        axios.post(`${pythonDomain}newFamilyRecord?familyRecord=${JSON.stringify(familyRecordData)}`)
         .then(response => {
             console.log('familyData:: ',response.data)
             if(response.data === 'Success'){
@@ -125,6 +216,15 @@ function FamilyDetails(){
                     progress: undefined,
                     theme: "colored",
                   });
+                  axios.post(`${pythonDomain}familyDetails`)
+                        .then(response => {
+                            setfamilyList(response.data);
+                            console.log('FamilyDetails:: ',response.data)
+                            setLoading(false);
+                        }) 
+                        .catch(error => { 
+                            console.error('FamilyDetails Error fetching data:', error); 
+                        });
                 setModal(false);
                 setFirstName('');
                 setLastName('');
@@ -157,7 +257,17 @@ function FamilyDetails(){
             
         }) 
         .catch(error => { 
-            console.error('familyData Error fetching data:', error); 
+            console.error('familyData Error fetching data:', JSON.stringify(error)); 
+            toast.error(error.message, {
+                position: "top-center",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored",
+              });
         }); 
     }
 
@@ -170,11 +280,11 @@ function FamilyDetails(){
                         </div>
                     )}
             <div className='FamilyTable'>
-                <table style={{width:'100%',paddingTop:'10px'}}>
+                <table>
                     <thead>
                         <tr>
                             <th style={{width:'25%',textAlign:'left'}}>Name</th>
-                            <th style={{width:'25%',textAlign:'left'}}>Relationship</th>
+                            <th style={{width:'25%',textAlign:'left'}}>Relationship</th> 
                             <th style={{width:'25%',textAlign:'left'}}></th>
                         </tr>
                     </thead>
@@ -184,12 +294,8 @@ function FamilyDetails(){
                                 <td>{fam.firstName} {fam.lastName}</td>
                                 <td>{fam.relationship}</td>
                                 <td>
-                                    <button type='submit' className='buttonStyle' onClick={updateFamily} style={{ marginRight: '10px' }}>
-                                        Update
-                                    </button>
-                                    <button type='submit' className='buttonStyle' onClick={deleteFamily} style={{ backgroundColor:'#ba0517' }}>
-                                        Delete
-                                    </button>
+                                    <button type='submit' className='buttonStyle' onClick={() => updateFamily(fam.id)} style={{ marginRight: '10px' }}><FontAwesomeIcon icon={faPencil} />   Update</button>
+                                    <button type='submit' className='buttonStyle' onClick={() => deleteFamily(fam.id)} style={{ backgroundColor:'#ba0517' }}><FontAwesomeIcon icon={faTrash} />   Delete</button>
                                 </td>
                             </tr>
                         ))}
@@ -205,7 +311,7 @@ function FamilyDetails(){
                                 <button className="close-button" onClick={onModalClose}>
                                     &times;        
                                 </button>
-                                <h3>Application Details</h3>
+                                <h3>Family Details</h3>
                             </div>
                             <div className="modal-body">
                                 <form>
@@ -219,22 +325,12 @@ function FamilyDetails(){
                                             <input type="text" name="LastName" value={lastName} onChange={(e) => setLastName(e.target.value)}></input>
                                         </div>
                                         <div className="custom-select">
-                                            <label htmlFor="Semester">Relationship</label>
-                                            <select name="Relationship" value={relationship} onChange={(e) => setRelationship(e.target.value)}>
-                                                {relationshipOptions.map(option => (
-                                                    <option key={option.id} value={option.id}>
-                                                        {option.name}
-                                                    </option>
-                                                ))}
-                                            </select>
+                                            <label htmlFor="SubmittedDate">Email</label>
+                                            <input type="text" name="Email" value={email} onChange={(e) => setEmail(e.target.value)}></input>
                                         </div>
                                         <div className="custom-select">
-                                            <label htmlFor="SubmittedDate">Occupation/Title</label>
-                                            <input type="text" name="Occupation" value={occupation} onChange={(e) => setOccupation(e.target.value)}></input>
-                                        </div>
-                                        <div className="custom-select">
-                                            <label htmlFor="SubmittedDate">Employer</label>
-                                            <input type="text" name="Employer" value={employer} onChange={(e) => setEmployer(e.target.value)}></input>
+                                            <label htmlFor="SubmittedDate">Contact Number</label>
+                                            <input type="text" name="ContactNumber" value={contactNumber} onChange={(e) => setContactNumber(e.target.value)}></input>
                                         </div>
                                         <div className="custom-select">
                                             <label htmlFor="SubmittedDate">Gender</label>
@@ -247,44 +343,32 @@ function FamilyDetails(){
                                             </select>
                                         </div>
                                         <div className="custom-select">
+                                            <label htmlFor="Semester">Relationship</label>
+                                            <select name="Relationship" value={relationship} onChange={(e) => setRelationship(e.target.value)}>
+                                                {relationshipOptions.map(option => (
+                                                    <option key={option.id} value={option.id}>
+                                                        {option.name}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        <div className="custom-select">
                                             <label htmlFor="SubmittedDate">DOB</label>
                                             <input type="date" value={dateofBirth} name="DOB" onChange={(e) => setDateofBirth(e.target.value)}></input>
                                         </div>
                                         <div className="custom-select">
+                                            <label htmlFor="SubmittedDate">Occupation/Title</label>
+                                            <input type="text" name="Occupation" value={occupation} onChange={(e) => setOccupation(e.target.value)}></input>
+                                        </div>
+                                        <div className="custom-select">
+                                            <label htmlFor="SubmittedDate">Employer</label>
+                                            <input type="text" name="Employer" value={employer} onChange={(e) => setEmployer(e.target.value)}></input>
+                                        </div>
+                                        
+                                        
+                                        <div className="custom-select">
                                             <label htmlFor="SubmittedDate">Qualification</label>
                                             <input type="text" name="Qualification" value={qualification} onChange={(e) => setQualification(e.target.value)}></input>
-                                        </div>
-                                        <div className="custom-select">
-                                            <label htmlFor="SubmittedDate">Contact Number</label>
-                                            <input type="text" name="ContactNumber" value={contactNumber} onChange={(e) => setContactNumber(e.target.value)}></input>
-                                        </div>
-                                        <div className="custom-select">
-                                            <label htmlFor="SubmittedDate">Email</label>
-                                            <input type="text" name="Email" value={email} onChange={(e) => setEmail(e.target.value)}></input>
-                                        </div>
-                                        <div className="custom-select">
-                                            <label htmlFor="SubmittedDate">Industry</label>
-                                            <select name="Industry" value={industry} onChange={(e) => setIndustry(e.target.value)}>
-                                                {industryOptions.map(option => (
-                                                    <option key={option.id} value={option.id}>
-                                                        {option.name}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                        </div>
-                                        <div className="custom-select">
-                                            <label htmlFor="SubmittedDate">Country</label>
-                                            <select name="Country" value={country} onChange={(e) => setCountry(e.target.value)}>
-                                                {countryOptions.map(option => (
-                                                    <option key={option.id} value={option.id}>
-                                                        {option.name}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                        </div>
-                                        <div className="custom-select">
-                                            <label htmlFor="SubmittedDate">State</label>
-                                            <input type="text" name="State" value={state} onChange={(e) => setState(e.target.value)}></input>
                                         </div>
                                         <div className="custom-select">
                                             <label htmlFor="SubmittedDate">Highest Level of Education</label>
@@ -296,13 +380,40 @@ function FamilyDetails(){
                                                 ))}
                                             </select>
                                         </div>
+                                        
+                                        <div className="custom-select">
+                                            <label htmlFor="SubmittedDate">Industry</label>
+                                            <select name="Industry" value={industry} onChange={(e) => setIndustry(e.target.value)}>
+                                                {industryOptions.map(option => (
+                                                    <option key={option.id} value={option.id}>
+                                                        {option.name}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        
                                         <div className="custom-select">
                                             <label htmlFor="SubmittedDate">City</label>
                                             <input type="text" name="City" value={city} onChange={(e) => setCity(e.target.value)}></input>
                                         </div>
                                         <div className="custom-select">
+                                            <label htmlFor="SubmittedDate">State</label>
+                                            <input type="text" name="State" value={state} onChange={(e) => setState(e.target.value)}></input>
+                                        </div>
+                                        <div className="custom-select">
+                                            <label htmlFor="SubmittedDate">Country</label>
+                                            <select name="Country" value={country} onChange={(e) => setCountry(e.target.value)}>
+                                                {countryOptions.map(option => (
+                                                    <option key={option.id} value={option.id}>
+                                                        {option.name}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        
+                                        <div className="custom-select">
                                             <label htmlFor="SubmittedDate">If deceased,Please check</label>
-                                            <input type="checkbox" name="deceased" value={IfDeceased} onChange={(e) => setIfDeceased(e.target.value)}></input>
+                                            <input type="checkbox" name="deceased" checked={IfDeceased} onChange={(e) => setIfDeceased(e.target.checked)}></input>
                                         </div>
                                     </div>
                                 </form>
@@ -316,8 +427,8 @@ function FamilyDetails(){
                 </div>
             )}
             <div>
-                <div className='buttonsDiv'><button type='submit' onClick={addNewFamily} className='buttonStyle'><i className="fa fa-plus"></i>Add New</button></div>
-                <div className='continueButton'><button type='submit' className='buttonStyle'>Continue</button></div>
+                <div className='buttonsDiv'><button type='submit' onClick={addNewFamily} className='buttonStyle'><FontAwesomeIcon className='plusIcon' icon={faPlus} />   Add New</button></div>
+                {/* <div className='continueButton'><button type='submit' className='buttonStyle'>Continue</button></div> */}
             </div>
         </div>
     );

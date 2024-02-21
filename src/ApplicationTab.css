@@ -2,7 +2,7 @@
     padding : 15px 0;
 }
 .buttonStyle {
-    padding: 8px 18px 8px 18px;
+    padding: 6px 15px 6px 15px;
     color: white;
     background-color: #2EA7E4;
     border: none;
@@ -39,7 +39,7 @@ table th {
     float: left;
     border: 1px solid #ccc;
     background-color: #f1f1f1;
-    width: 16%;
+    width: 15%;
     height: 540px;
     margin-top: 1%;
     margin-left: 5%;
@@ -70,7 +70,7 @@ table th {
 }
 .vtabcontent {
     float: left;
-    padding-left:5%;
+    padding-left:3%;
     width: 70%;
     border-left: none;
     margin-top: 1%;

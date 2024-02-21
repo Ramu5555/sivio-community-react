@@ -2,16 +2,17 @@ import React from 'react';
 import { useState, useEffect } from "react";
 import axios from 'axios';
 
+import { FadeLoader  } from 'react-spinners';
+import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { faEye } from '@fortawesome/free-solid-svg-icons';
 import { faAnglesRight } from '@fortawesome/free-solid-svg-icons';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 
-import { ToastContainer, toast } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
 import './ApplicationTab.css';
-
 import PersonalDetails from './PersonalDetails';
 import FamilyDetails from './FamilyDetails';
 import EmploymentDetails from './EmploymentDetails';
@@ -29,24 +30,33 @@ import NewApplication from './NewApplication';
 function ApplicationTab() {
 
     // ------------------------------------------------Variable Declaration Starts here---------------------------------------------------
+
+    const pythonDomain = 'http://localhost:5000/';
+
+    const[appId, setAppId] = useState('');
     const [applicationsList, setapplicationsList] = useState([]);
     const [campusList, setCampusList] = useState([]);
 
     const [modalOpen, setModalOpen] = useState(false);
     const [createApplication, setcreateApplication] = useState(false);
-    const [viewApplicationodal, setviewApplicationodal] = useState(false);
+    const [viewApplicationModal, setviewApplicationModal] = useState(false);
     const [campusEnable, setcampusEnable] = useState(false);
 
     const [applicationNumber, setapplicationNumber] = useState('');
     const [communityStatus, setcommunityStatus] = useState('');
     const [semister, setsemister] = useState('');
     const [submittedDate, setsubmittedDate] = useState('');
+    const [loading, setLoading] = useState(true);
+    const [continuerec, setcontinuerec] = useState(false);
 
-        useEffect(() => { 
-        axios.get('http://localhost:5000/api/Applications')
+        useEffect(() => {
+        axios.post(`${pythonDomain}Applications`) 
         .then(response => {
             setapplicationsList(response.data);
             console.log('Applications:: ',response.data)
+            if(response.data !== undefined){
+                setLoading(false);
+           }
         }) 
         .catch(error => { 
             console.error('Error fetching data:', error); 
@@ -54,7 +64,9 @@ function ApplicationTab() {
         }, []);
 
         // ------------------------------------------------Application continue button ---------------------------------------------------
-        const aplliContinue = ()=> {
+        const aplliContinue = (appId)=> {
+            setAppId(appId);
+            setcontinuerec(true);
             console.log('apppp')
             if (document.getElementById('ApplicationTable')) {
                 if (document.getElementById('ApplicationTable').style.display === 'none') {
@@ -71,14 +83,14 @@ function ApplicationTab() {
 
         // ------------------------------------------------Application View button ---------------------------------------------------
         const viewApplication = (status, applicationNo,submitDate) =>{
-            setviewApplicationodal(true);
+            setviewApplicationModal(true);
             setapplicationNumber(applicationNo);
             setcommunityStatus(status)
             setsubmittedDate(submitDate)
         }
 
         const onModalClose = () =>{
-            setviewApplicationodal(false);
+            setviewApplicationModal(false);
         }
 
         // ------------------------------------------------Application Tab button ---------------------------------------------------
@@ -111,7 +123,7 @@ function ApplicationTab() {
         const newApplication = () => {
             setcreateApplication(true);
             setcampusEnable(true)
-            axios.get('http://localhost:5000/api/campus')
+            axios.post(`${pythonDomain}campus`)
             .then(response => {
                 setCampusList(response.data);
                 setcampusEnable(false)
@@ -140,7 +152,7 @@ function ApplicationTab() {
                 theme: "colored",
               });
             console.log('Refresh');
-            axios.get('http://localhost:5000/api/Applications')
+            axios.post(`${pythonDomain}Applications`) 
                 .then(response => {
                     setapplicationsList(response.data);
                     console.log('Updated Data: ', response.data);
@@ -159,9 +171,14 @@ function ApplicationTab() {
                 </div>
                 <div className="grid-item">
                 <ToastContainer/>
+                {loading && (
+                                    <div className="spinner-container">
+                                        <FadeLoader  color={'#000000'} loading={loading} size={100} />
+                                    </div>
+                                )}
                     <div style={{fontSize:'20px',fontWeight:'500'}}>Applications</div>
                     <div className='ApplicationTable' id='ApplicationTable'>
-                        <table style={{width:'100%',paddingTop:'10px'}}>
+                        <table>
                             <thead>
                                 <tr>
                                     <th style={{width:'20%',textAlign:'left'}}>Name</th>
@@ -181,7 +198,7 @@ function ApplicationTab() {
                                             <FontAwesomeIcon icon={faEye} /> View
                                         </button>
                                         ) : (
-                                        <button type='submit' className='buttonStyle' onClick={aplliContinue} style={{ marginLeft: '10px' }}>
+                                        <button type='submit' className='buttonStyle' onClick={() => aplliContinue(contact.appId)} style={{ marginLeft: '10px' }}>
                                             Continue <FontAwesomeIcon icon={faAnglesRight} />
                                         </button>
                                         )}
@@ -196,7 +213,7 @@ function ApplicationTab() {
                             <NewApplication isOpen={modalOpen} campusList={campusList} onClose={closeModal} onApplicationSave={RefreshData} campusEnable={campusEnable}>
                             </NewApplication>
                         )}
-                        {viewApplicationodal && (
+                        {viewApplicationModal && (
                             <div className="modal-overlay">
                                 <div className="modal">
                                     <div className="modal-header">
@@ -252,7 +269,7 @@ function ApplicationTab() {
                             </div>
                         </div>
                         <div id="Personal" className="vtabcontent">
-                            <PersonalDetails/>
+                            <PersonalDetails></PersonalDetails>
                         </div>
                         <div id="FamilyDetails" className="vtabcontent">
                             <FamilyDetails/>
@@ -273,7 +290,9 @@ function ApplicationTab() {
                             <TestScores/>
                         </div>
                         <div id="Recommendations" className="vtabcontent">
-                            <Recommendations/>
+                            {continuerec && (
+                                <Recommendations appId={appId}/>
+                            )}
                         </div>
                         <div id="Resume" className="vtabcontent">
                             <Resume/>

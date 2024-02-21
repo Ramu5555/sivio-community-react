@@ -1,0 +1,95 @@
+.personalDetalis{
+    height: 36rem;
+    width:950px;
+    border:2px;
+    overflow-y: auto;
+}
+@media only screen and (max-width : 860px){
+.personalDetalis{
+    height: 36rem;
+    width:100%;
+    border:2px;
+    overflow-y: auto;
+}
+}
+
+@media only screen and (max-width: 680px) and (min-width:0px){
+    .personalDetalis {
+        width:100%;
+        height: 100%;
+        border:2px;
+        overflow-y: auto;
+        
+    }
+}
+
+
+.personalDetalis .account-details, .personal-details {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    }
+.personalDetalis .account-details >div, .personal-details >div >div {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    }
+.personalDetalis .account-details >div, .personal-details >div, .personalDetalis input, .personalDetalis label,  select, textarea{
+    width: 48%;
+    justify-content: center;
+    }
+.personalDetalis .vtabcontent {
+        float: left;
+        padding-left:5%;
+        width: 70%;
+        border-left: none;
+        margin-top: 1%;
+      }
+    
+.personalDetalis .required-field::before {
+      content: "*";
+      color: red;
+    }
+.personalDetalis .sectionTitle {
+      background-color: #e0e0e0;
+      padding-left: 15px;
+      font-weight: 500;
+    }
+ .contentdiv {
+      text-align: center;
+      margin-top: 10px;
+    }
+.personalDetalis .buttonStyle {
+      padding: 8px 18px 8px 18px;
+      color: white;
+      background-color: #2EA7E4;
+      border: none;
+      font-size: 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+}
+
+.personalDetalis label 
+{
+    padding: 5px;
+    margin: 12px;
+}
+.personalDetalis input 
+{
+    padding: 5px;
+    margin: 12px;
+}
+.personalDetalis select 
+{
+    padding: 5px;
+    margin: 12px;
+}
+.personalDetalis h4 {
+    margin: 12px 0;
+}
+.personalDetalis .account-details textarea{
+    padding: 5px;
+    margin: 12px;
+
+}
+      

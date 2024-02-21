@@ -69,8 +69,8 @@ form div {
     display: block;
   }
   
-  .newFamily input,
-  textarea {
+  .newFamily textarea,
+  .newFamily input {
     padding: 7px;
     width: 80%;
     font-size: 15px;
@@ -78,5 +78,5 @@ form div {
   .newFamily select {
     padding: 7px;
     width: 85%;
-    font-size: 15px;
+    font-size: 13px;
   }

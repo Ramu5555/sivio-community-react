@@ -1,0 +1,34 @@
+.fileModal .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .fileModal .modal {
+    background: white;
+    border-radius: 5px;
+    width: 40%;
+  }
+  
+  .fileModal .modal-header {
+    /* display: flex; */
+    justify-content: space-between;
+    text-align: center;
+    border-bottom: 2px solid #DDDBDA;
+  }
+  .fileModal .modal-body {
+    border-bottom: 2px solid #DDDBDA;
+    position: relative;
+    padding: 0 5%;
+  }
+.fileModal label {
+    font-size: 15px;
+    color: #5a5656;
+    margin-bottom: 3px;
+}

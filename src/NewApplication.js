@@ -10,6 +10,9 @@ import { FadeLoader  } from 'react-spinners';
 const NewApplication = ({ isOpen, onClose, children,campusList,onApplicationSave,campusEnable }) => {
 
 // ------------------------------------------------Variable Declaration Starts here---------------------------------------------------
+
+    const pythonDomain = 'http://localhost:5000/';
+
     const [selectedCampus, setSelectedCampus] = useState('');
     const [selectedIntake, setSelectedIntake] = useState('');
     const [selectedCourseType, setSelectedCourseType] = useState('');
@@ -43,17 +46,17 @@ const NewApplication = ({ isOpen, onClose, children,campusList,onApplicationSave
     ];
     
     const handleCampusChange = (event) => {
-        const selectedValue = event.target.value;
-        if(!selectedValue){
+        const selectedCampus = event.target.value;
+        console.log('selectedValue ', selectedCampus); 
+        if(!selectedCampus){
             setcampusError(true);
         }else{
             setcampusError(false);
         }
-        setSelectedCampus(selectedValue);
+        setSelectedCampus(selectedCampus);
         setLoading(true);
         setintakeEnable(true);
-        console.log('Selected Campus:', selectedValue);
-        axios.get(`http://localhost:5000/api/intake?campusId=${selectedValue}`)
+        axios.post(`${pythonDomain}intake`, { selectedCampus })
             .then(response => {
                 setintakeList(response.data);
                 setLoading(false);
@@ -89,7 +92,7 @@ const NewApplication = ({ isOpen, onClose, children,campusList,onApplicationSave
         setLoading(true);
         setcouseTypeEnable(true);
         console.log('Selected intake:', selectedValue);
-        axios.get(`http://localhost:5000/api/courseType?campusId=${selectedCampus}&intake=${selectedValue}`)
+        axios.post(`${pythonDomain}courseType`, { selectedCampus,selectedValue })
         .then(response => {
             setcourseTypeList(response.data);
             console.log('courseTypeList:: ',JSON.stringify(response.data))
@@ -123,7 +126,7 @@ const NewApplication = ({ isOpen, onClose, children,campusList,onApplicationSave
         }
         setLoading(true);
         setcourseEnable(true);
-        axios.get(`http://localhost:5000/api/course?campusId=${selectedCampus}&intake=${selectedIntake}&courseType=${selectedValue}`)
+        axios.post(`${pythonDomain}course`, { selectedCampus,selectedIntake,selectedValue })
         .then(response => {
             setcourseList(response.data);
             setLoading(false);
@@ -175,7 +178,7 @@ const NewApplication = ({ isOpen, onClose, children,campusList,onApplicationSave
         }else if(!course){
             setcourseError(true);
         }else{
-            axios.get(`http://localhost:5000/api/newAppliaction?campus=${campus}&intake=${intake}&courseType=${courseType}&course=${course}`)
+            axios.post(`${pythonDomain}newAppliaction`, { campus,intake,courseType,course })
                 .then(response => {
                     if(response.data ==='Success'){
                         onClose1();

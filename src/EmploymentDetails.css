@@ -1,0 +1,14 @@
+.expDiv {
+    margin-top: 10px;
+    display: flex;
+}
+.expDiv label {
+    width: 50%;
+}
+.gapTADiv label {
+    margin: 20px 0;
+}
+.expInp {
+    padding: 7px;
+    width: 20%;
+}
